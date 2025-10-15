@@ -1,3 +1,5 @@
+import json
+
 def read_file():
     total_upper_cases = 0
     count_dict = dict()
@@ -11,12 +13,19 @@ def read_file():
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
 
-    #element 3, calculate total lower case letters
-    return [total_upper_cases, count_dict, total_letters, total_letters - total_upper_cases, total_lines]
+    
+    #return dictionary
+    return {
+        "total_upper_cases": total_upper_cases,
+        "total_lower_cases": total_letters - total_upper_cases,
+        "total_letters": total_letters,
+        "total_lines": total_lines,
+        "letter_counts": count_dict
+    }
 
 
 
-def case_distribution(line):
+def case_distribution(line): #will be used later with matplotlib
     upper_case = 0
 
     for element in line: #checks each element in line
@@ -25,12 +34,6 @@ def case_distribution(line):
                 upper_case += 1
 
     return upper_case
-
-
-def print_letters(count_dict):
-
-    for i in count_dict:
-        print(f'{i} appears {count_dict[i]} time(s)')
 
 
 
@@ -48,13 +51,18 @@ def count_letters(sentence, count_dict, total_letters):
             count_dict[character] += 1
         elif character in '!.?,': #checks for punctuation
             count_dict[character] = 1 #adds punctuation key to dictionary
+    return total_letters
 
 
+#?pseudocode exporting data
+# convert data to json/dictionary format
+# export it to JSON
 
+def export_data(stats_dict):
+    with open("stats.json", "w") as file:
+        json.dump(stats_dict, file, indent=4) #? json.dump() used to serialize a python dictionary into a JSON formatted string and write directly in a file
 
-#pseudocode exporting data
+export_data(read_file())
 
-def export_data(stats):
-    with open("stats.txt", "w") as file:
-        file.writelines(stats)
+    
         
