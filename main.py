@@ -45,7 +45,6 @@ def ten_words(word_count_dict, top_10_words):
 
 
 
-
 def number_of_words(line, word_count_dict, total_words):
     line = punctuation_remover(line)
     word_in_line = line.split() #creates a list of every word
@@ -126,22 +125,23 @@ def enter_int(): #error handling to input only int
 #add option to read the file and return in console info
 
 def file_menu():
-    files = glob.glob("*.txt")
+    files = glob.glob("txtfiles/*.txt")
     is_running = True
 
     print("================= Text Analysis Program =================\n")
     for index, file in enumerate(files, start=1): # enumerate - used for displaying elements in a list with an index at the start
         print(f"{index}. {file}")
 
+
     if len(files) == 0: #error handling for no files found
         print("No textfiles found :'(")
-        return
+        return #break loop
 
     while is_running:
         try:
             user_input = enter_int()
             if user_input > 0 and user_input <= len(files): #error handling to choose a valid existing file
-                return files[user_input]
+                return files[user_input - 1]
             else:
                 raise #generate an error so it hops to except block
         except:
@@ -173,13 +173,13 @@ def main():
         if user_input == 1:
             file = file_menu()
 
-        elif user_input == 2:
+        elif user_input == 2 and file:
             data = read_file(file)
 
             for element in data: #displays data with key, value pairs
                 print(f"{element}: {data[element]}")
 
-        elif user_input == 3:
+        elif user_input == 3 and file:
             print("Exporting data...")
             export_data(data)
 
@@ -188,6 +188,9 @@ def main():
         elif user_input == 5:
             print("Exiting program, see ya later!")
             is_running = False
+
+        elif file == None:
+            print("Choose a file")
 
         else:
             print("Not a valid input! Enter what has been listed")
