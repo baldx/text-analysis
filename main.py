@@ -3,11 +3,13 @@ import glob
 
 
 def read_file(output):
-    total_upper_cases = 0
     count_dict = dict()
+    top_10_words = dict()
+    word_count_dict = dict()
+
+    total_upper_cases = 0
     total_letters = 0
     total_lines = 0
-    word_count_dict = dict()
     total_words = 0
 
     print(output)
@@ -19,7 +21,8 @@ def read_file(output):
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words)
-    
+    ten_words(word_count_dict, top_10_words)
+
     #return dictionary
     return {
         "total_upper_cases": total_upper_cases,
@@ -28,8 +31,18 @@ def read_file(output):
         "total_lines": total_lines,
         "letter_counts": count_dict,
         "word_counts": word_count_dict,
-        "total_words": total_words
+        "total_words": total_words,
+        "top_10_words": top_10_words,
     }
+
+
+def ten_words(word_count_dict, top_10_words):
+    sorted_word_count = sorted(word_count_dict.items(), key=lambda item: item[1], reverse = True) #creates a tuple sorted by element 1(value) from high to low
+    sorted_word_count = sorted_word_count[ : 10] #slices the first 10 elements
+
+    for word, value in sorted_word_count: #loops through the tuples and stores the key and values in word and value
+        top_10_words[word] = value
+
 
 
 
@@ -105,7 +118,7 @@ def enter_int(): #error handling to input only int
         except:
             print("Enter a valid number!")
 
-
+#?Pseudocode
 #display text files
 #make user be able to choose a text file
 #return that text file to readfile()
@@ -134,9 +147,6 @@ def file_menu():
         except:
             print("Not a valid input. Please select one of the text files!")
 
-
-#create menu with options
-#when exporting data,
 
 def menu():
     print("================= Text Analysis Program =================\n")
