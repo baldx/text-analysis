@@ -94,13 +94,13 @@ def export_data(stats_dict):
         json.dump(stats_dict, file, indent=4) #? json.dump() used to serialize a python dictionary into a JSON formatted string and write directly in a file
 
 
-def enter_int():
+def enter_int(): #error handling to input only int
     is_true = True
 
 
     while is_true:
         try:
-            int_input = int(input("Enter input: "))
+            int_input = int(input("Enter input: ")) 
             return int_input
         except:
             print("Enter a valid number!")
@@ -113,17 +113,21 @@ def enter_int():
 #add option to read the file and return in console info
 
 def file_menu():
-    files = glob.glob("txtfiles/*.txt")
+    files = glob.glob("*.txt")
     is_running = True
 
     print("================= Text Analysis Program =================\n")
-    for index, file in enumerate(files, start=1): # enumerate - used for displaying elements in a list with an index aswell at the start
+    for index, file in enumerate(files, start=1): # enumerate - used for displaying elements in a list with an index at the start
         print(f"{index}. {file}")
+
+    if len(files) == 0: #error handling for no files found
+        print("No textfiles found :'(")
+        return
 
     while is_running:
         try:
             user_input = enter_int()
-            if user_input > 0 and user_input <= len(files):
+            if user_input > 0 and user_input <= len(files): #error handling to choose a valid existing file
                 return files[user_input]
             else:
                 raise #generate an error so it hops to except block
@@ -151,12 +155,14 @@ def main():
     data = None
 
     while is_running:
+            
         menu()
 
         user_input = enter_int()
         
         if user_input == 1:
             file = file_menu()
+
         elif user_input == 2:
             data = read_file(file)
 
@@ -167,12 +173,14 @@ def main():
             print("Exporting data...")
             export_data(data)
 
+        #!display diagrams with matplotlib later
+        
         elif user_input == 5:
             print("Exiting program, see ya later!")
             is_running = False
-        else:
-            print("Not a valid input! Enter whats been listed")
 
+        else:
+            print("Not a valid input! Enter what has been listed")
 
 
 main()
