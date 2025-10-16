@@ -101,8 +101,7 @@ def enter_int():
     while is_true:
         try:
             int_input = int(input("Enter input: "))
-            if int_input > 0:
-                return int_input
+            return int_input
         except:
             print("Enter a valid number!")
 
@@ -115,12 +114,21 @@ def enter_int():
 
 def file_menu():
     files = glob.glob("txtfiles/*.txt")
+    is_running = True
 
     print("================= Text Analysis Program =================\n")
     for index, file in enumerate(files, start=1): # enumerate - used for displaying elements in a list with an index aswell at the start
         print(f"{index}. {file}")
 
-    return files[enter_int()]
+    while is_running:
+        try:
+            user_input = enter_int()
+            if user_input > 0 and user_input <= len(files):
+                return files[user_input]
+            else:
+                raise #generate an error so it hops to except block
+        except:
+            print("Not a valid input. Please select one of the text files!")
 
 
 #create menu with options
