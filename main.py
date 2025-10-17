@@ -191,14 +191,37 @@ def menu():
     print("2. Display relevant statistics")
     print("3. Export data to JSON file")
     print("4. Show data in a graph")
-    print("5. Exit program\n")
+    print("5. Compare 2 files")
+    print("6. Exit program\n")
 
+
+#function for displaying results of difference of cases
+def calculate_case_difference(x, y, file_1, file_2):
+    if x > y:
+        return f"File {file_1} has {x - y} more upper case letters than {file_2}"
+    elif y > x:
+        return f"File {file_2} has {y - x} more upper case letters than {file_1}"
+    else:
+        return "Both files have the same amount of upper case letters"
+
+
+#function for displaying compared files
+def compare_files(file_1, file_2):
+    file_1_stats = read_file(file_1)
+    file_2_stats = read_file(file_2)
+
+    print("Relevant statistics for the files:")
     
+    print(calculate_case_difference(file_1_stats["total_upper_cases"], file_2_stats["total_upper_cases"], file_1, file_2)) #print difference
+
+
     
 def main():
     is_running = True
     file = None
     data = None
+    file_1 = None
+    file_2 = None
 
     while is_running:
             
@@ -221,7 +244,20 @@ def main():
 
         #!display diagrams with matplotlib later
         
+        #comparing filkes
         elif user_input == 5:
+            print("Choose your first file!")
+            file_1 = file_menu()
+
+            print("Choose your second file!")
+            file_2 = file_menu()
+
+            compare_files(file_1, file_2)
+
+
+
+
+        elif user_input == 6:
             print("Exiting program, see ya later!")
             is_running = False
 
