@@ -11,6 +11,10 @@ def read_file(output):
     total_letters = 0
     total_lines = 0
     total_words = 0
+    
+    longest_sentence = ""
+    shortest_sentence = "sigma"*10 
+    #placeholder rather than having an extra if statement which will use more power when comparing a whole file
 
     print(output)
     with open(f"{output}", "r", encoding="utf8") as file:
@@ -21,7 +25,8 @@ def read_file(output):
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words)
-    ten_words(word_count_dict, top_10_words)
+                ten_words(word_count_dict, top_10_words)
+                longest_sentence, shortest_sentence = find_sentences(longest_sentence, shortest_sentence, line)
 
     #return dictionary
     return {
@@ -33,15 +38,18 @@ def read_file(output):
         "word_counts": word_count_dict,
         "total_words": total_words,
         "top_10_words": top_10_words,
+        "longest_sentence": longest_sentence,
+        "shortest_sentence": shortest_sentence,
     }
 
 
 def ten_words(word_count_dict, top_10_words):
     sorted_word_count = sorted(word_count_dict.items(), key=lambda item: item[1], reverse = True) #creates a tuple sorted by element 1(value) from high to low
-    sorted_word_count = sorted_word_count[ : 10] #slices the first 10 elements
+    sorted_word_count = sorted_word_count[ : 10] #slicesk the first 10 elements
 
     for word, value in sorted_word_count: #loops through the tuples and stores the key and values in word and value
         top_10_words[word] = value
+
 
 
 
@@ -95,6 +103,34 @@ def count_letters(sentence, count_dict, total_letters):
         elif character in '!.?,': #checks for punctuation
             count_dict[character] = 1 #adds punctuation key to dictionary
     return total_letters
+
+#?longest sentences
+#go through each line in a text file
+#count total words in that line
+#when largest sentences compares to something longer, update variable and save sentence
+
+def find_sentences(longest_sentence, shortest_sentence, line):
+    total_words_in_sentence = ""
+
+
+    for char in line:
+        if char in ".!?": #check for if char is one of the puncuation
+            
+            sentence = total_words_in_sentence.strip()
+            if sentence: #checks if sentence is not an empty string
+                if len(sentence) > len(longest_sentence): #if a sentence is larger than largest sentence, upddate
+                    longest_sentence = total_words_in_sentence
+
+                if len(sentence) < len(shortest_sentence): #if a sentence is smaller than smallest sentence, upddate
+                    shortest_sentence = sentence
+                total_words_in_sentence = ""
+        else:
+            total_words_in_sentence += char
+
+
+    return longest_sentence, shortest_sentence
+
+        
 
 
 #?pseudocode exporting data
