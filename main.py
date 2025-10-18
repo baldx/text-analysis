@@ -35,12 +35,14 @@ def read_file(output):
         "total_letters": total_letters,
         "total_lines": total_lines,
         "letter_counts": count_dict,
-        "word_counts": word_count_dict,
         "total_words": total_words,
-        "top_10_words": top_10_words,
         "longest_sentence": longest_sentence,
         "shortest_sentence": shortest_sentence,
         "total_sentences": total_sentences,
+        "average_word_per_sentence": round(total_words / total_sentences, 2),
+        "average_word_per_line": round(total_words / total_lines, 2),
+        "word_counts": word_count_dict,
+        "top_10_words": top_10_words,
     }
 
 
