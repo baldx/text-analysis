@@ -17,7 +17,6 @@ def read_file(output):
     shortest_sentence = "sigma"*10 
     #placeholder rather than having an extra if statement which will use more power when comparing a whole file
 
-    print(output)
     with open(f"{output}", "r", encoding="utf8") as file:
         for line in file: #read each line 1 by 1
 
@@ -198,8 +197,34 @@ def menu():
     print("5. Compare 2 files")
     print("6. Exit program\n")
 
+def stats_menu(data):
+    is_running = True
+    keys_list = list(data.keys()) #adds all keys in a key
 
-#function for displaying results of difference of cases
+    while is_running:
+        print("What would you like to see?")
+
+        for index, element in enumerate(data, start=1): #prints a list with numbers in the console starting from 1
+            print(f"{index}. {element}")
+            if index == len(data):
+                print(f"{index + 1}. Go back")
+        
+        user_input = enter_int() - 1
+        if user_input >= 0 and user_input <= len(data): #check if input is in bound
+
+            if user_input != len(data): 
+                print(f"{keys_list[user_input]}: {data[keys_list[user_input]]}") #print the chosen data
+            elif user_input == len(data): #exit program
+                is_running = False
+
+        else: #error message
+            print("Not a valid input, enter an input within bounds")
+
+
+
+
+
+#function for displaying results of difference of different statistics
 def calculate_case_difference(x, y, file_1, file_2):
     if x > y:
         return f"File {file_1} has {x - y} more upper case letters than {file_2}"
@@ -208,6 +233,37 @@ def calculate_case_difference(x, y, file_1, file_2):
     else:
         return "Both files have the same amount of upper case letters"
 
+def calculate_letter_difference(x, y, file_1, file_2):
+    if x > y:
+        return f"File {file_1} has {x - y} more letters than {file_2}"
+    elif y > x:
+        return f"File {file_2} has {y - x} more letters than {file_1}"
+    else:
+        return "Both files have the same amount of letters"
+    
+def calculate_line_difference(x, y, file_1, file_2):
+    if x > y:
+        return f"File {file_1} has {x - y} more lines than {file_2}"
+    elif y > x:
+        return f"File {file_2} has {y - x} more lines than {file_1}"
+    else:
+        return "Both files have the same amount of lines"
+
+def calculate_words_difference(x, y, file_1, file_2):
+    if x > y:
+        return f"File {file_1} has {x - y} more words than {file_2}"
+    elif y > x:
+        return f"File {file_2} has {y - x} more words than {file_1}"
+    else:
+        return "Both files have the same amount of words"
+
+def calculate_sentence_difference(x, y, file_1, file_2):
+    if x > y:
+        return f"File {file_1} has {x - y} more sentences than {file_2}"
+    elif y > x:
+        return f"File {file_2} has {y - x} more sentences than {file_1}"
+    else:
+        return "Both files have the same amount of sentences"
 
 #function for displaying compared files
 def compare_files(file_1, file_2):
@@ -217,6 +273,11 @@ def compare_files(file_1, file_2):
     print("Relevant statistics for the files:")
     
     print(calculate_case_difference(file_1_stats["total_upper_cases"], file_2_stats["total_upper_cases"], file_1, file_2)) #print difference
+    print(calculate_letter_difference(file_1_stats["total_letters"], file_2_stats["total_letters"], file_1, file_2)) #print difference
+    print(calculate_line_difference(file_1_stats["total_lines"], file_2_stats["total_lines"], file_1, file_2)) #print difference
+    print(calculate_words_difference(file_1_stats["total_words"], file_2_stats["total_words"], file_1, file_2)) #print difference
+    print(calculate_sentence_difference(file_1_stats["total_sentences"], file_2_stats["total_sentences"], file_1, file_2)) #print difference
+
 
 
     
@@ -239,8 +300,11 @@ def main():
         elif user_input == 2 and file:
             data = read_file(file)
 
-            for element in data: #displays data with key, value pairs
-                print(f"{element}: {data[element]}")
+            stats_menu(data)
+
+
+            #for element in data: #displays data with key, value pairs
+            #    print(f"{element}: {data[element]}")
 
         elif user_input == 3 and file:
             print("Exporting data...")
@@ -248,7 +312,7 @@ def main():
 
         #!display diagrams with matplotlib later
         
-        #comparing filkes
+        #comparing files
         elif user_input == 5:
             print("Choose your first file!")
             file_1 = file_menu()
@@ -257,8 +321,6 @@ def main():
             file_2 = file_menu()
 
             compare_files(file_1, file_2)
-
-
 
 
         elif user_input == 6:
