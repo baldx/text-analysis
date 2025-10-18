@@ -7,6 +7,9 @@ def read_file(output):
     top_10_words = dict()
     word_count_dict = dict()
 
+    words_once = set()
+    unique_words = set()
+
     total_upper_cases = 0
     total_letters = 0
     total_lines = 0
@@ -24,9 +27,10 @@ def read_file(output):
                 total_lines += 1
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
-                total_words = number_of_words(line.lower(), word_count_dict, total_words)
+                total_words = number_of_words(line.lower(), word_count_dict, total_words, unique_words)
                 longest_sentence, shortest_sentence, total_sentences = find_sentences(longest_sentence, shortest_sentence, total_sentences, line)
-                
+    
+    words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
 
     #return dictionary
@@ -40,6 +44,8 @@ def read_file(output):
         "longest_sentence": longest_sentence,
         "shortest_sentence": shortest_sentence,
         "total_sentences": total_sentences,
+        "words_appearing_once": words_once,
+        "unique_words": unique_words,
         "average_word_per_sentence": round(total_words / total_sentences, 2),
         "average_word_per_line": round(total_words / total_lines, 2),
         "word_counts": word_count_dict,
@@ -48,16 +54,38 @@ def read_file(output):
 
 
 def ten_words(word_count_dict, top_10_words):
-    sorted_word_count = sorted(word_count_dict.items(), key=lambda item: item[1], reverse = True) #creates a tuple sorted by element 1(value) from high to low
-    sorted_word_count = sorted_word_count[ : 10] #slicesk the first 10 elements
+    sorted_word_count = []
+    
+    for word, value in word_count_dict.items(): #loops through all the words and values in the dictionary as a set. 
+        sorted_word_count.append([value, word]) #adds the the set in the list and switches the word and 
 
-    for word, value in sorted_word_count: #loops through the tuples and stores the key and values in word and value
+    sorted_word_count.sort(reverse = True) #sorts the list from high to low
+    sorted_word_count = sorted_word_count[ : 10] #slices the first 10
+    
+    for value, word in sorted_word_count: #loops through the tuples and stores the key and values in word and value
         top_10_words[word] = value
 
 
+def words_appearing_once(word_count_dict, words_once):
+    sorted_word_count = []
+    for word, value in word_count_dict.items(): #loops through all the words and values in the dictionary as a set. 
+        sorted_word_count.append([value, word]) #adds the the set in the list and switches the word and 
+
+    sorted_word_count.sort() #sorts the list from low to high
+    index = 0
+    
+    for value, word in sorted_word_count: #loops through the values and words in the list
+        if value > 1: #checks if the word appears more than once
+            break
+        index += 1 #verifies where the loop is compared to the index of the list
+
+    sorted_word_count = sorted_word_count[ : index] #slices the list where the value is more than one 
+    
+    for value, word in sorted_word_count: #loops through the words and values in the list
+        words_once.add(word)
 
 
-def number_of_words(line, word_count_dict, total_words):
+def number_of_words(line, word_count_dict, total_words, unique_words):
     line = punctuation_remover(line)
     word_in_line = line.split() #creates a list of every word
 
@@ -67,6 +95,7 @@ def number_of_words(line, word_count_dict, total_words):
             total_words += 1
         else:
             word_count_dict[word] = 1 #adds word key to dictionary
+            unique_words.add(word) #adds unique word to a set
             total_words += 1
     return total_words
 
@@ -74,7 +103,7 @@ def number_of_words(line, word_count_dict, total_words):
 
 def punctuation_remover(line):
     for char in line: #checks each character in line
-        if char in '''~@#¤%^&*()_-+=<>?/,.;:!{}[]|'"''': #checks if character is a special character
+        if char in '''~@#¤%^&*()_-+=<>?/,.;:!{}[]—|'"''': #checks if character is a special character
             line = line.replace(char, ' ') #replaces special characters with a space
     return line
 
