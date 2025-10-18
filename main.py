@@ -18,15 +18,16 @@ def read_file(output):
     #placeholder rather than having an extra if statement which will use more power when comparing a whole file
 
     with open(f"{output}", "r", encoding="utf8") as file:
-        for line in file: #read each line 1 by 1
-
+        
+        for line in file:
             if line: #only works if line is not an empty array
                 total_lines += 1
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words)
-                ten_words(word_count_dict, top_10_words)
                 longest_sentence, shortest_sentence, total_sentences = find_sentences(longest_sentence, shortest_sentence, total_sentences, line)
+                
+    ten_words(word_count_dict, top_10_words)
 
     #return dictionary
     return {
