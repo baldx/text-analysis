@@ -11,6 +11,7 @@ def read_file(output):
     total_letters = 0
     total_lines = 0
     total_words = 0
+    total_sentences = 0
     
     longest_sentence = ""
     shortest_sentence = "sigma"*10 
@@ -26,7 +27,7 @@ def read_file(output):
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words)
                 ten_words(word_count_dict, top_10_words)
-                longest_sentence, shortest_sentence = find_sentences(longest_sentence, shortest_sentence, line)
+                longest_sentence, shortest_sentence, total_sentences = find_sentences(longest_sentence, shortest_sentence, total_sentences, line)
 
     #return dictionary
     return {
@@ -40,6 +41,7 @@ def read_file(output):
         "top_10_words": top_10_words,
         "longest_sentence": longest_sentence,
         "shortest_sentence": shortest_sentence,
+        "total_sentences": total_sentences,
     }
 
 
@@ -109,15 +111,17 @@ def count_letters(sentence, count_dict, total_letters):
 #count total words in that line
 #when largest sentences compares to something longer, update variable and save sentence
 
-def find_sentences(longest_sentence, shortest_sentence, line):
+def find_sentences(longest_sentence, shortest_sentence, total_sentences, line):
     total_words_in_sentence = ""
 
 
     for char in line:
         if char in ".!?": #check for if char is one of the puncuation
-            
             sentence = total_words_in_sentence.strip()
+
             if sentence: #checks if sentence is not an empty string
+                total_sentences += 1
+
                 if len(sentence) > len(longest_sentence): #if a sentence is larger than largest sentence, upddate
                     longest_sentence = total_words_in_sentence
 
@@ -128,7 +132,7 @@ def find_sentences(longest_sentence, shortest_sentence, line):
             total_words_in_sentence += char
 
 
-    return longest_sentence, shortest_sentence
+    return longest_sentence, shortest_sentence, total_sentences
 
         
 
