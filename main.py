@@ -46,6 +46,7 @@ def read_file(output):
         "total_sentences": total_sentences,
         "words_appearing_once": words_once,
         "unique_words": unique_words,
+        "average_letters_per_word": round(total_letters / total_words, 2),
         "average_word_per_sentence": round(total_words / total_sentences, 2),
         "average_word_per_line": round(total_words / total_lines, 2),
         "word_counts": word_count_dict,
@@ -172,10 +173,14 @@ def find_sentences(longest_sentence, shortest_sentence, total_sentences, line):
 # convert data to json/dictionary format
 # export it to JSON
 
+
+
 def export_data(stats_dict):
     with open("stats.json", "w") as file:
-        json.dump(stats_dict, file, indent=4) #? json.dump() used to serialize a python dictionary into a JSON formatted string and write directly in a file
-
+        json.dump(stats_dict, file, indent=4, default=lambda o: list(o) if isinstance(o, set) else o) #? json.dump() used to serialize a python dictionary into a JSON formatted string and write directly in a file
+    #default lambda line says when dumping to JSON, if you see a set, turn it into a list so JSON can handle it, if anything else just return it
+    #it does it by using default which tells the program that if json.dump() encounters a data type which it doesnt know how to searlize
+    #use lambda for creating an inline function or an anonymous function that takes an argument and returns something
 
 def enter_int(): #error handling to input only int
     is_true = True
@@ -246,6 +251,7 @@ def stats_menu(data):
 
             if user_input != len(data): 
                 print(f"{keys_list[user_input]}: {data[keys_list[user_input]]}") #print the chosen data
+                
             elif user_input == len(data): #exit program
                 is_running = False
 
@@ -335,12 +341,13 @@ def main():
             stats_menu(data)
 
 
-            #for element in data: #displays data with key, value pairs
-            #    print(f"{element}: {data[element]}")
-
         elif user_input == 3 and file:
             print("Exporting data...")
-            export_data(data)
+            if data:
+                export_data(data)
+            else:
+                data = read_file(file)
+                export_data(data)
 
         #!display diagrams with matplotlib later
         
