@@ -15,9 +15,12 @@ def read_file(output):
     total_lines = 0
     total_words = 0
     total_sentences = 0
+
     
     longest_sentence = ""
     shortest_sentence = "sigma"*10 
+    current_sentence = ""
+
     #placeholder rather than having an extra if statement which will use more power when comparing a whole file
 
     with open(f"{output}", "r", encoding="utf8") as file:
@@ -28,7 +31,7 @@ def read_file(output):
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words, unique_words)
-                longest_sentence, shortest_sentence, total_sentences = find_sentences(longest_sentence, shortest_sentence, total_sentences, line)
+                longest_sentence, shortest_sentence, total_sentences, current_sentence = find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence)
     
     words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
@@ -143,28 +146,28 @@ def count_letters(sentence, count_dict, total_letters):
 #count total words in that line
 #when largest sentences compares to something longer, update variable and save sentence
 
-def find_sentences(longest_sentence, shortest_sentence, total_sentences, line):
-    total_words_in_sentence = ""
-
+def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence):
 
     for char in line:
+
         if char in ".!?": #check for if char is one of the puncuation
-            sentence = total_words_in_sentence.strip()
+            sentence = current_sentence.strip()
 
             if sentence: #checks if sentence is not an empty string
                 total_sentences += 1
 
                 if len(sentence) > len(longest_sentence): #if a sentence is larger than largest sentence, upddate
-                    longest_sentence = total_words_in_sentence
+                    longest_sentence = current_sentence
 
                 if len(sentence) < len(shortest_sentence): #if a sentence is smaller than smallest sentence, upddate
                     shortest_sentence = sentence
-                total_words_in_sentence = ""
+                    print(line)
+                current_sentence = ""
         else:
-            total_words_in_sentence += char
+            current_sentence += char
 
 
-    return longest_sentence, shortest_sentence, total_sentences
+    return longest_sentence, shortest_sentence, total_sentences, current_sentence
 
         
 
@@ -180,7 +183,7 @@ def export_data(stats_dict):
         json.dump(stats_dict, file, indent=4, default=lambda o: list(o) if isinstance(o, set) else o) #? json.dump() used to serialize a python dictionary into a JSON formatted string and write directly in a file
     #default lambda line says when dumping to JSON, if you see a set, turn it into a list so JSON can handle it, if anything else just return it
     #it does it by using default which tells the program that if json.dump() encounters a data type which it doesnt know how to searlize
-    #use lambda for creating an inline function or an anonymous function that takes an argument and returns something
+    #use lambda for creating an inline function (an anonymous function) that takes an argument and returns something, in this case a list if its a set and everything else return normally
 
 def enter_int(): #error handling to input only int
     is_true = True
