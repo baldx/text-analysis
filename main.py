@@ -1,5 +1,6 @@
 import json
 import glob
+import matplotlib.pyplot as plt
 
 
 def read_file(output):
@@ -160,6 +161,40 @@ def punctuation_remover(line):
         if char in '''~@#¤%^&*()_-+=<>?/,.;:!{}[]—|'"''': #checks if character is a special character
             line = line.replace(char, ' ') #replaces special characters with a space
     return line
+
+def visualize_data(upper_case, lower_case, top_10_word_count):
+
+
+    fig, ax = plt.subplots(2, 2, figsize=(20, 8)) #creates a 2D array which is a 2x2 row and colomn grid for displaying charts
+    #can adjust the dimensions later for more plots if needed
+    
+    #CASE DISTRIBUTION CHART
+
+    ax[0, 0].pie( #ax[0,0] says choose the plot which is in the first row and first colomn
+        [upper_case, lower_case],               # pass sizes as first arg (not sizes=)
+        labels=["Upper case", "Lower case"],
+        colors=["red", "blue"],
+        autopct='%1.1f%%', #use percentages
+        startangle=90 #rotate 90 degrees for nicer touch
+    )
+
+    ax[0, 0].set_title("Case Distribution (Pie)") #adds title for chart when ONLY using plt.subplots() otherwise when using plt.subplot(), setting titles with .title()
+
+    #TOP 10 WORDS CHART
+
+    letters = []
+    values = []
+    for element in top_10_word_count: #get the keys and values in their lists
+        letters.append(element)
+        values.append(top_10_word_count[element])
+    ax[0, 1].bar(letters, values) #adds the letters as x values and the values to the letters as y values
+    ax[0, 1].set_title("Most common words")
+
+
+    plt.tight_layout() #adjust layout so titles dont overlap
+    plt.show()
+    
+    
 
 
 
@@ -401,8 +436,25 @@ def main():
                 data = read_file(file)
                 export_data(data)
 
-        #!display diagrams with matplotlib later
-        
+        #Stuff to show:
+        #upper case - lower case distribution with pie chart
+        #top 10 words with diagram
+        #most common letter
+        #miscellaneous stuff such as:
+            #total words
+            #total sentences
+            #total lines
+            #total letters
+
+        elif user_input == 4 and file:
+
+
+            if data:
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"])
+            else:
+                data = read_file(file)
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"])
+                    
         #comparing files
         elif user_input == 5:
             print("Choose your first file!")
