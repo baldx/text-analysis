@@ -15,6 +15,7 @@ def read_file(output):
     total_lines = 0
     total_words = 0
     total_sentences = 0
+    sentiment = 0
 
     
     longest_sentence = ""
@@ -35,6 +36,7 @@ def read_file(output):
     
     words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
+    sentiment = sentiment_counter(sentiment, word_count_dict)
 
     #return dictionary
     return {
@@ -54,7 +56,55 @@ def read_file(output):
         "average_word_per_line": round(total_words / total_lines, 2),
         "word_counts": word_count_dict,
         "top_10_words": top_10_words,
+        "sentiment": sentiment
     }
+
+def sentiment_counter(sentiment, word_count_dict):
+    # sets for basic sentiment counter
+    happy_words = (
+    "glad", "lycklig", "fantastisk", "underbar", "härlig", "trevlig", "positiv", "kärleksfull",
+    "snäll", "vacker", "rolig", "kul", "nöjd", "hoppfull", "inspirerande", "motiverad", "framgångsrik",
+    "tacksam", "charmig", "briljant", "leende", "mysig", "trygg", "lugn", "harmonisk", "säker",
+    "uppskattad", "älskad", "välsignad", "fri", "stark", "modig", "pigg", "energisk", "varm", "vänlig",
+    "omtänksam", "hjälpsam", "lyckad", "positivt", "imponerande", "kreativ", "klok", "smart", "givande",
+    "välmående", "betydelsefull", "motiverande", "upplyftande", "fantastisk", "imponerad",
+    "tillfredsställd", "avslappnad", "bekväm", "underhållande", "hopp", "glädje", "styrka", "framgång",
+    "framåt", "uppskattning", "skratt", "njutning", "solsken", "blomstrande", "strålande", "välkomnande",
+    "festlig", "tacksamhet", "respektfull", "hederlig", "ärlig", "öppen", "rättvis", "lojal", "trogen",
+    "pålitlig", "påhittig", "entusiastisk", "passionerad", "hoppfullhet", "kärlek", "tillgivenhet",
+    "vänskap", "gemenskap", "förtroende", "stöd", "trygghet", "balans", "lugn", "fred", "glädjefull",
+    "fantasifull", "inspirerad", "charmfull", "mod", "vilja", "kraft", "uppskattande", "nöje",
+    "optimistisk", "drömmande", "hoppgivande", "positivism", "lyckorus", "tillfreds", "lycka",
+    "stolt", "växande", "blommande", "skön", "ren", "ljus", "klar", "strålande", "livlig", "fest",
+    "glädjeämne"
+)
+
+    sad_words = (
+    "ledsen", "arg", "besviken", "ensam", "trött", "rädd", "orolig", "stressad", "irriterad",
+    "deprimerad", "förvirrad", "tom", "sårad", "kall", "mörk", "eländig", "misslyckad", "värdelös",
+    "hopplös", "bitter", "hatisk", "förbannad", "avundsjuk", "svag", "missnöjd", "besvärad", "orolig",
+    "skamsen", "skyldig", "trasig", "sorgsen", "deppig", "ilsken", "arg", "tung", "sorglig", "dyster",
+    "förlorad", "rädsla", "panik", "ångest", "skakad", "krossad", "ledsam", "frusen", "trist", "missmodig",
+    "olycklig", "bortglömd", "ensamhet", "uttråkad", "missförstådd", "nedstämd", "pressad", "stress",
+    "hat", "ilska", "förakt", "avsky", "tårar", "gråt", "smärta", "lidande", "bekymrad", "orolighet",
+    "skam", "ångestfylld", "bruten", "uppgiven", "hopplöshet", "svek", "besvikelse", "förlust", "sorg",
+    "oro", "tvivel", "rädsla", "osäker", "osäkerhet", "feg", "svaghet", "skadad", "tragedi", "död",
+    "enslighet", "förtvivlad", "frustrerad", "förbannad", "arghet", "förtryckt", "plågad", "skadad",
+    "förnedrad", "otrygg", "räddhågsen", "nedbruten", "utsliten", "enslig", "svekfull", "hård", "kallhjärtad",
+    "bortstött", "förkastad", "avvisad", "ensamstående", "tyst", "sörjande", "kvävd", "lidande", "bortgång",
+    "sjuk", "sårbar", "osedd", "obekväm", "melankolisk", "olycka", "sorglighet", "förtvivlan", "ångestfull"
+)
+
+    
+    for element in word_count_dict:
+        if element in happy_words:
+            sentiment += word_count_dict[element]
+            
+        elif element in sad_words:
+            sentiment -= word_count_dict[element]
+    
+    return sentiment
+
 
 
 def ten_words(word_count_dict, top_10_words):
@@ -161,7 +211,6 @@ def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, c
 
                 if len(sentence) < len(shortest_sentence): #if a sentence is smaller than smallest sentence, upddate
                     shortest_sentence = sentence
-                    print(line)
                 current_sentence = ""
         else:
             current_sentence += char
