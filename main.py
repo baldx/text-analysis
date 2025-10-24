@@ -7,6 +7,7 @@ def read_file(output):
     count_dict = dict()
     top_10_words = dict()
     word_count_dict = dict()
+    sentence_distribution = dict()
 
     words_once = set()
     unique_words = set()
@@ -17,6 +18,7 @@ def read_file(output):
     total_words = 0
     total_sentences = 0
     sentiment = 0
+
 
     
     longest_sentence = ""
@@ -33,7 +35,7 @@ def read_file(output):
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
                 total_words = number_of_words(line.lower(), word_count_dict, total_words, unique_words)
-                longest_sentence, shortest_sentence, total_sentences, current_sentence = find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence)
+                longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_distribution = find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_distribution)
     
     words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
@@ -57,8 +59,12 @@ def read_file(output):
         "average_word_per_line": round(total_words / total_lines, 2),
         "word_counts": word_count_dict,
         "top_10_words": top_10_words,
-        "sentiment": sentiment
+        "sentiment": sentiment,
+        "sentence_distribution": dict(sorted(sentence_distribution.items(), key=get_value, reverse=True)) #sorts dictionary, by the values and reverses so biggest starts first
     }
+
+def get_value(item): #when sorting, get the second element from the tupple, aka get the value of the dictionary ex: (1: 772), returns 772
+    return item[1]
 
 def sentiment_counter(sentiment, word_count_dict):
     # sets for basic sentiment counter
@@ -182,12 +188,12 @@ def visualize_data(upper_case, lower_case, top_10_word_count):
 
     #TOP 10 WORDS CHART
 
-    letters = []
+    words = []
     values = []
     for element in top_10_word_count: #get the keys and values in their lists
-        letters.append(element)
+        words.append(element)
         values.append(top_10_word_count[element])
-    ax[0, 1].bar(letters, values) #adds the letters as x values and the values to the letters as y values
+    ax[0, 1].bar(words, values) #adds the letters as x values and the values to the letters as y values
     ax[0, 1].set_title("Most common words")
 
 
@@ -231,14 +237,26 @@ def count_letters(sentence, count_dict, total_letters):
 #count total words in that line
 #when largest sentences compares to something longer, update variable and save sentence
 
-def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence):
+def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_dist_dict):
+
 
     for char in line:
 
         if char in ".!?": #check for if char is one of the puncuation
+
             sentence = current_sentence.strip()
 
+
             if sentence: #checks if sentence is not an empty string
+
+                total_words_in_sentence = sentence.count(" ") #count total spaces in sentence and that equals to total words
+
+                if total_words_in_sentence in sentence_dist_dict: #if exist in dictionary
+                    sentence_dist_dict[total_words_in_sentence] += 1
+                    
+                else:
+                    sentence_dist_dict[total_words_in_sentence] = 1
+
                 total_sentences += 1
 
                 if len(sentence) > len(longest_sentence): #if a sentence is larger than largest sentence, upddate
@@ -251,7 +269,7 @@ def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, c
             current_sentence += char
 
 
-    return longest_sentence, shortest_sentence, total_sentences, current_sentence
+    return longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_dist_dict
 
         
 
@@ -447,7 +465,6 @@ def main():
             #total letters
 
         elif user_input == 4 and file:
-
 
             if data:
                 visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"])
