@@ -63,13 +63,14 @@ def read_file(output):
         "average_word_per_line": round(total_words / total_lines, 2),
         "word_counts": word_count_dict,
         "top_10_words": top_10_words,
-        "sentiment": sentiment,
+        "sentiment": f"{sentiment}, {calculate_sentiment_message(sentiment)}",
         "sentence_distribution": dict(sorted(sentence_distribution.items(), key=get_value, reverse=True)), #sorts dictionary, by the values and reverses so biggest starts first
         "word_distribution": dict(sorted(word_distribution.items())), #sorts dictionary, by the values and reverses so biggest starts first
     }
 
 def get_value(item): #when sorting, get the second element from the tupple, aka get the value of the dictionary ex: (1: 772), returns 772
     return item[1]
+
 
 def sentiment_counter(sentiment, word_count_dict):
     # sets for basic sentiment counter
@@ -116,6 +117,20 @@ def sentiment_counter(sentiment, word_count_dict):
             sentiment -= word_count_dict[element]
     
     return sentiment
+
+def calculate_sentiment_message(sentiment_score):
+    if sentiment_score == 0:
+        return 'This story is neutral'
+    elif sentiment_score < 0 and sentiment_score > -100:
+        return 'This story is sad'
+    elif sentiment_score < -100:
+        return 'This story is very, very sad'
+    elif sentiment_score > 0 and sentiment_score < 100:
+        return 'This story is happy!'
+    elif sentiment_score > 100:
+        return 'This story is very, very happy!'
+    else:
+        return 'Stories happiness could not be calculated'
 
 
 
@@ -224,7 +239,7 @@ def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentenc
         
     ax[1, 1].hist(raw_word_len_data, 
                   bins="auto", #creates the necessary amount of bars needed based on the raw data
-                  linewidth=1.5, #makes the lines between the bars thicker
+                  linkanewidth=1.5, #makes the lines between the bars thicker
                   edgecolor="white")
     
     ax[1, 1].set_title("Word distribution")
