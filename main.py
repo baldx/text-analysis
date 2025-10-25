@@ -8,6 +8,7 @@ def read_file(output):
     top_10_words = dict()
     word_count_dict = dict()
     sentence_distribution = dict()
+    word_distribution = dict()
 
     words_once = set()
     unique_words = set()
@@ -18,6 +19,7 @@ def read_file(output):
     total_words = 0
     total_sentences = 0
     sentiment = 0
+    total_long_words = 0
 
 
     
@@ -34,8 +36,10 @@ def read_file(output):
                 total_lines += 1
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
-                total_words = number_of_words(line.lower(), word_count_dict, total_words, unique_words)
-                longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_distribution = find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_distribution)
+                total_words, total_long_words = number_of_words(line.lower(), word_count_dict, total_words, total_long_words, unique_words, word_distribution)
+
+                longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_distribution = find_sentences(
+                    longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_distribution)
     
     words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
@@ -60,7 +64,8 @@ def read_file(output):
         "word_counts": word_count_dict,
         "top_10_words": top_10_words,
         "sentiment": sentiment,
-        "sentence_distribution": dict(sorted(sentence_distribution.items(), key=get_value, reverse=True)) #sorts dictionary, by the values and reverses so biggest starts first
+        "sentence_distribution": dict(sorted(sentence_distribution.items(), key=get_value, reverse=True)), #sorts dictionary, by the values and reverses so biggest starts first
+        "word_distribution": dict(sorted(word_distribution.items())), #sorts dictionary, by the values and reverses so biggest starts first
     }
 
 def get_value(item): #when sorting, get the second element from the tupple, aka get the value of the dictionary ex: (1: 772), returns 772
@@ -146,19 +151,32 @@ def words_appearing_once(word_count_dict, words_once):
         words_once.add(word)
 
 
-def number_of_words(line, word_count_dict, total_words, unique_words):
+def number_of_words(line, word_count_dict, total_words, total_long_words, unique_words, word_distribution):
+    
     line = punctuation_remover(line)
     word_in_line = line.split() #creates a list of every word
 
     for word in word_in_line: #checks each word in the list
+        
         if word in word_count_dict: #checks if word is in dictionary
             word_count_dict[word] += 1 
             total_words += 1
+            if len(word) > 6:
+                total_long_words += 1
+                
         else:
             word_count_dict[word] = 1 #adds word key to dictionary
             unique_words.add(word) #adds unique word to a set
             total_words += 1
-    return total_words
+            if len(word) > 6:
+                total_long_words += 1
+
+        if len(word) in word_distribution:
+            word_distribution[len(word)] += 1
+
+        else:
+            word_distribution[len(word)] = 1
+    return total_words, total_long_words
 
 
 
@@ -168,7 +186,7 @@ def punctuation_remover(line):
             line = line.replace(char, ' ') #replaces special characters with a space
     return line
 
-def visualize_data(upper_case, lower_case, top_10_word_count):
+def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentence_dist):
 
 
     fig, ax = plt.subplots(2, 2, figsize=(20, 8)) #creates a 2D array which is a 2x2 row and colomn grid for displaying charts
@@ -195,6 +213,29 @@ def visualize_data(upper_case, lower_case, top_10_word_count):
         values.append(top_10_word_count[element])
     ax[0, 1].bar(words, values) #adds the letters as x values and the values to the letters as y values
     ax[0, 1].set_title("Most common words")
+
+
+    #WORD DIST HISTOGRAM
+
+    raw_word_len_data = [] 
+    for key in word_dist: #get the keys in the dictionery
+        for i in range(word_dist[key]): #loops the amount of times based on the keys value
+            raw_word_len_data.append(key)
+        
+    ax[1, 1].hist(raw_word_len_data, 
+                  bins="auto", #creates the necessary amount of bars needed based on the raw data
+                  linewidth=1.5, #makes the lines between the bars thicker
+                  edgecolor="white")
+    
+    ax[1, 1].set_title("Word distribution")
+
+    sentence_len = []
+    values = []
+    for element in sentence_dist:
+        sentence_len.append(element)
+        values.append(sentence_dist[element])
+    ax[1, 0].bar(sentence_len, values)
+    ax[1, 0].set_title("Sentence distribution")
 
 
     plt.tight_layout() #adjust layout so titles dont overlap
@@ -251,10 +292,10 @@ def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, c
 
                 total_words_in_sentence = sentence.count(" ") #count total spaces in sentence and that equals to total words
 
-                if total_words_in_sentence in sentence_dist_dict: #if exist in dictionary
+                if total_words_in_sentence in sentence_dist_dict and total_words_in_sentence != 0: #if exist in dictionary and also filter out every instance of 0 words in sentence
                     sentence_dist_dict[total_words_in_sentence] += 1
                     
-                else:
+                elif total_words_in_sentence not in sentence_dist_dict and total_words_in_sentence != 0:
                     sentence_dist_dict[total_words_in_sentence] = 1
 
                 total_sentences += 1
@@ -467,10 +508,10 @@ def main():
         elif user_input == 4 and file:
 
             if data:
-                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"])
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"], data["word_distribution"], data["sentence_distribution"])
             else:
                 data = read_file(file)
-                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"])
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"], data["word_distribution"], data["sentence_distribution"])
                     
         #comparing files
         elif user_input == 5:
