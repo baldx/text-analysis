@@ -41,6 +41,7 @@ def read_file(output):
                 longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_distribution = find_sentences(
                     longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_distribution)
     
+    lix = lix_score(total_words, total_sentences, total_long_words)
     words_appearing_once(word_count_dict, words_once) #bring these functions outside so it updates once and not every iteration to save time
     ten_words(word_count_dict, top_10_words)
     sentiment = sentiment_counter(sentiment, word_count_dict)
@@ -64,6 +65,7 @@ def read_file(output):
         "word_counts": word_count_dict,
         "top_10_words": top_10_words,
         "sentiment": f"{sentiment}, {calculate_sentiment_message(sentiment)}",
+        "lix_score": f"{lix}, {lix_message(lix)}",
         "sentence_distribution": dict(sorted(sentence_distribution.items(), key=get_value, reverse=True)), #sorts dictionary, by the values and reverses so biggest starts first
         "word_distribution": dict(sorted(word_distribution.items())), #sorts dictionary, by the values and reverses so biggest starts first
     }
@@ -132,6 +134,25 @@ def calculate_sentiment_message(sentiment_score):
     else:
         return 'Stories happiness could not be calculated'
 
+def lix_message(lix):
+    
+    if 0 <= lix and lix <= 24:
+        return 'This text is very easy and suitable for children'
+    elif 25 <= lix and lix <= 34:
+        return 'This text is easy and suitable for a general audience'
+    elif 35 <= lix and lix <= 44:
+        return 'This text is average and typical readablity for novels'
+    elif 45 <= lix and lix <= 54:
+        return 'This text is difficult and suitable for academics'
+    elif 55 <= lix:
+        return 'This text is very difficult and suitable for specialized literature'
+    else:
+        return 'The text lix score could not be calculated'
+
+def lix_score(total_words, total_sentences, total_long_words):
+    lix = round((total_words / total_sentences) + ((total_long_words / total_words) * 100), 2)
+    
+    return lix
 
 
 def ten_words(word_count_dict, top_10_words):
