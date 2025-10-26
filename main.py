@@ -520,7 +520,15 @@ def compare_files(file_1, file_2):
     print(calculate_sentence_difference(file_1_stats["total_sentences"], file_2_stats["total_sentences"], file_1, file_2)) #print difference
 
 
+def save_cache(file, file_cache, data):
 
+    if file in file_cache: #O(1) look up
+        data = file_cache[file]
+    else:
+        data = read_file(file)
+        file_cache[file] = data 
+
+    return data, file_cache
     
 def main():
     is_running = True
@@ -528,6 +536,8 @@ def main():
     data = None
     file_1 = None
     file_2 = None
+
+    file_cache = {} #create chache for saving data from files
 
     while is_running:
             
@@ -539,7 +549,8 @@ def main():
             file = file_menu()
 
         elif user_input == 2 and file:
-            data = read_file(file)
+
+            data, file_cache = save_cache(file, file_cache, data)
 
             stats_menu(data)
 
@@ -549,7 +560,7 @@ def main():
             if data:
                 export_data(data)
             else:
-                data = read_file(file)
+                data, file_cache = save_cache(file, file_cache, data)
                 export_data(data)
 
         #Stuff to show:
@@ -563,13 +574,13 @@ def main():
             #total letters
 
         elif user_input == 4 and file:
-
             if data:
                 visualize_data(data["total_upper_cases"], data["total_lower_cases"], 
                                data["top_10_words"], data["word_distribution"], 
-                               data["sentence_distribution", data["letter_counts"]])
+                               data["sentence_distribution"], data["letter_counts"])
             else:
-                data = read_file(file)
+                data, file_cache = save_cache(file, file_cache, data)
+
                 visualize_data(data["total_upper_cases"], data["total_lower_cases"], 
                                data["top_10_words"], data["word_distribution"], 
                                data["sentence_distribution"], data["letter_counts"])
