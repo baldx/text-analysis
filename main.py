@@ -201,10 +201,10 @@ def punctuation_remover(line):
             line = line.replace(char, ' ') #replaces special characters with a space
     return line
 
-def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentence_dist):
+def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentence_dist, letter_count):
 
 
-    fig, ax = plt.subplots(2, 2, figsize=(20, 8)) #creates a 2D array which is a 2x2 row and colomn grid for displaying charts
+    fig, ax = plt.subplots(3, 2, figsize=(20, 8)) #creates a 2D array which is a 2x2 row and colomn grid for displaying charts
     #can adjust the dimensions later for more plots if needed
     
     #CASE DISTRIBUTION CHART
@@ -239,19 +239,40 @@ def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentenc
         
     ax[1, 1].hist(raw_word_len_data, 
                   bins="auto", #creates the necessary amount of bars needed based on the raw data
-                  linkanewidth=1.5, #makes the lines between the bars thicker
+                  linewidth=1.5, #makes the lines between the bars thicker
                   edgecolor="white")
     
     ax[1, 1].set_title("Word distribution")
 
-    sentence_len = []
-    values = []
-    for element in sentence_dist:
-        sentence_len.append(element)
-        values.append(sentence_dist[element])
-    ax[1, 0].bar(sentence_len, values)
-    ax[1, 0].set_title("Sentence distribution")
+    #LETTER COUNT 
+    
+    keys = list(letter_count.keys())
+    keys.sort()
+    
+    letter = []
+    value = []
+    for key in keys: #gets the keys in the sorted list
+        if key.isalpha(): #checks if the key is in the alphabet
+            letter.append(key)
+            value.append(letter_count[key])
+    
+    ax[1, 0].bar(letter, value) #adds the letters as x and the values to the letters as y
+    ax[1, 0].set_title("Letter count")
 
+    #SENTENCE DISTRIBUTION
+
+    ax[2, 0].set_visible(False) #hides the positions
+    ax[2, 1].set_visible(False)
+
+    big_ax = fig.add_subplot(3, 1, 3)  #creates a new subplot with 3 rows, 1 column and choose the third aka the last row
+
+    sentence_len = list(sentence_dist.keys()) #get keys and values in list
+    values = list(sentence_dist.values())
+
+    big_ax.bar(sentence_len, values)
+    big_ax.set_title("Sentence distribution")
+
+    
 
     plt.tight_layout() #adjust layout so titles dont overlap
     plt.show()
@@ -523,10 +544,14 @@ def main():
         elif user_input == 4 and file:
 
             if data:
-                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"], data["word_distribution"], data["sentence_distribution"])
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], 
+                               data["top_10_words"], data["word_distribution"], 
+                               data["sentence_distribution", data["letter_counts"]])
             else:
                 data = read_file(file)
-                visualize_data(data["total_upper_cases"], data["total_lower_cases"], data["top_10_words"], data["word_distribution"], data["sentence_distribution"])
+                visualize_data(data["total_upper_cases"], data["total_lower_cases"], 
+                               data["top_10_words"], data["word_distribution"], 
+                               data["sentence_distribution"], data["letter_counts"])
                     
         #comparing files
         elif user_input == 5:
