@@ -20,8 +20,6 @@ def read_file(output):
     total_sentences = 0
     sentiment = 0
     total_long_words = 0
-
-
     
     longest_sentence = ""
     shortest_sentence = "sigma"*10 
@@ -36,7 +34,7 @@ def read_file(output):
                 total_lines += 1
                 total_letters = count_letters(line.lower(), count_dict, total_letters)
                 total_upper_cases += case_distribution(line)
-                total_words, total_long_words = number_of_words(line.lower(), word_count_dict, total_words, total_long_words, unique_words, word_distribution)
+                total_words, total_long_words = find_number_words(line.lower(), word_count_dict, total_words, total_long_words, unique_words, word_distribution)
 
                 longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_distribution = find_sentences(
                     longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_distribution)
@@ -171,7 +169,7 @@ def ten_words(word_count_dict, top_10_words):
 def words_appearing_once(word_count_dict, words_once):
     sorted_word_count = []
     for word, value in word_count_dict.items(): #loops through all the words and values in the dictionary as a set. 
-        sorted_word_count.append([value, word]) #adds the the set in the list and switches the word and 
+        sorted_word_count.append([value, word]) #adds the the set in the list and switches the word and value
 
     sorted_word_count.sort() #sorts the list from low to high
     index = 0
@@ -187,7 +185,7 @@ def words_appearing_once(word_count_dict, words_once):
         words_once.add(word)
 
 
-def number_of_words(line, word_count_dict, total_words, total_long_words, unique_words, word_distribution):
+def find_number_words(line, word_count_dict, total_words, total_long_words, unique_words, word_distribution):
     
     line = punctuation_remover(line)
     word_in_line = line.split() #creates a list of every word
@@ -255,7 +253,7 @@ def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentenc
 
     raw_word_len_data = [] 
     for key in word_dist: #get the keys in the dictionery
-        for i in range(word_dist[key]): #loops the amount of times based on the keys value
+        for _ in range(word_dist[key]): #loops the amount of times based on the keys value
             raw_word_len_data.append(key)
         
     ax[1, 1].hist(raw_word_len_data, 
@@ -269,7 +267,7 @@ def visualize_data(upper_case, lower_case, top_10_word_count, word_dist, sentenc
     
     keys = list(letter_count.keys())
     keys.sort()
-    
+
     letter = []
     value = []
     for key in keys: #gets the keys in the sorted list
@@ -330,10 +328,7 @@ def count_letters(sentence, count_dict, total_letters):
             count_dict[character] = 1 #adds punctuation key to dictionary
     return total_letters
 
-#?longest sentences
-#go through each line in a text file
-#count total words in that line
-#when largest sentences compares to something longer, update variable and save sentence
+
 
 def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, current_sentence, sentence_dist_dict):
 
@@ -369,12 +364,6 @@ def find_sentences(longest_sentence, shortest_sentence, total_sentences, line, c
 
     return longest_sentence, shortest_sentence, total_sentences, current_sentence, sentence_dist_dict
 
-        
-
-
-#?pseudocode exporting data
-# convert data to json/dictionary format
-# export it to JSON
 
 
 
@@ -388,7 +377,6 @@ def export_data(stats_dict):
 def enter_int(): #error handling to input only int
     is_true = True
 
-
     while is_true:
         try:
             int_input = int(input("Enter input: ")) 
@@ -396,12 +384,7 @@ def enter_int(): #error handling to input only int
         except:
             print("Enter a valid number!")
 
-#?Pseudocode
-#display text files
-#make user be able to choose a text file
-#return that text file to readfile()
-#add option for exporting to json
-#add option to read the file and return in console info
+
 
 def file_menu():
     files = glob.glob("txtfiles/*.txt")
@@ -425,6 +408,7 @@ def file_menu():
                 raise #generate an error so it hops to except block
         except:
             print("Not a valid input. Please select one of the text files!")
+    print(" ")
 
 
 def menu():
@@ -436,8 +420,10 @@ def menu():
     print("4. Show data in a graph")
     print("5. Compare 2 files")
     print("6. Exit program\n")
+    print(" ")
 
 def stats_menu(data):
+    print(" ")
     is_running = True
     keys_list = list(data.keys()) #adds all keys in a key
 
@@ -506,8 +492,10 @@ def calculate_sentence_difference(x, y, file_1, file_2):
     else:
         return "Both files have the same amount of sentences"
 
+
 #function for displaying compared files
 def compare_files(file_1, file_2):
+    print(" ")
     file_1_stats = read_file(file_1)
     file_2_stats = read_file(file_2)
 
@@ -520,6 +508,7 @@ def compare_files(file_1, file_2):
     print(calculate_sentence_difference(file_1_stats["total_sentences"], file_2_stats["total_sentences"], file_1, file_2)) #print difference
 
 
+
 def save_cache(file, file_cache, data):
 
     if file in file_cache: #O(1) look up
@@ -530,6 +519,11 @@ def save_cache(file, file_cache, data):
 
     return data, file_cache
     
+
+
+
+
+
 def main():
     is_running = True
     file = None
@@ -548,11 +542,15 @@ def main():
         if user_input == 1:
             file = file_menu()
 
+
+
         elif user_input == 2 and file:
 
             data, file_cache = save_cache(file, file_cache, data)
 
             stats_menu(data)
+
+
 
 
         elif user_input == 3 and file:
@@ -563,15 +561,7 @@ def main():
                 data, file_cache = save_cache(file, file_cache, data)
                 export_data(data)
 
-        #Stuff to show:
-        #upper case - lower case distribution with pie chart
-        #top 10 words with diagram
-        #most common letter
-        #miscellaneous stuff such as:
-            #total words
-            #total sentences
-            #total lines
-            #total letters
+
 
         elif user_input == 4 and file:
             if data:
@@ -585,6 +575,8 @@ def main():
                                data["top_10_words"], data["word_distribution"], 
                                data["sentence_distribution"], data["letter_counts"])
                     
+
+
         #comparing files
         elif user_input == 5:
             print("Choose your first file!")
@@ -596,12 +588,18 @@ def main():
             compare_files(file_1, file_2)
 
 
+
+
         elif user_input == 6:
             print("Exiting program, see ya later!")
             is_running = False
 
+
+
         elif file == None:
             print("Choose a file")
+
+
 
         else:
             print("Not a valid input! Enter what has been listed")
