@@ -494,10 +494,10 @@ def calculate_sentence_difference(x, y, file_1, file_2):
 
 
 #function for displaying compared files
-def compare_files(file_1, file_2):
+def compare_files(file_1, file_2, file_cache, data):
     print(" ")
-    file_1_stats = read_file(file_1)
-    file_2_stats = read_file(file_2)
+    file_1_stats, file_cache = save_cache(file_1, file_cache, data)
+    file_2_stats, file_cache = save_cache(file_2, file_cache, data)
 
     print("Relevant statistics for the files:")
     
@@ -526,6 +526,8 @@ def save_cache(file, file_cache, data):
 
 def main():
     is_running = True
+    is_true = True
+
     file = None
     data = None
     file_1 = None
@@ -585,7 +587,15 @@ def main():
             print("Choose your second file!")
             file_2 = file_menu()
 
-            compare_files(file_1, file_2)
+            while is_true:
+                if file_2 == file_1:
+                    print("Please pick a different file!")
+                    file_2 = file_menu()
+                else:
+                    is_true = False
+
+            compare_files(file_1, file_2, file_cache, data)
+
 
 
 
