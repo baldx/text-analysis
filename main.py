@@ -74,7 +74,10 @@ def get_value(item): #when sorting, get the second element from the tupple, aka 
 
 def sentiment_counter(sentiment, word_count_dict):
     # sets for basic sentiment counter
-    happy_words = (
+
+    language = None
+
+    happy_words_SE = (
     "glad", "lycklig", "fantastisk", "underbar", "härlig", "trevlig", "positiv", "kärleksfull",
     "snäll", "vacker", "rolig", "kul", "nöjd", "hoppfull", "inspirerande", "motiverad", "framgångsrik",
     "tacksam", "charmig", "briljant", "leende", "mysig", "trygg", "lugn", "harmonisk", "säker",
@@ -92,7 +95,7 @@ def sentiment_counter(sentiment, word_count_dict):
     "glädjeämne"
 )
 
-    sad_words = (
+    sad_words_SE = (
     "ledsen", "arg", "besviken", "ensam", "trött", "rädd", "orolig", "stressad", "irriterad",
     "deprimerad", "förvirrad", "tom", "sårad", "kall", "mörk", "eländig", "misslyckad", "värdelös",
     "hopplös", "bitter", "hatisk", "förbannad", "avundsjuk", "svag", "missnöjd", "besvärad", "orolig",
@@ -108,14 +111,58 @@ def sentiment_counter(sentiment, word_count_dict):
     "sjuk", "sårbar", "osedd", "obekväm", "melankolisk", "olycka", "sorglighet", "förtvivlan", "ångestfull"
 )
 
-    
-    for element in word_count_dict:
-        if element in happy_words:
-            sentiment += word_count_dict[element]
-            
-        elif element in sad_words:
-            sentiment -= word_count_dict[element]
-    
+    happy_words_EN = (
+        "happy", "joyful", "amazing", "wonderful", "great", "nice", "positive", "loving",
+        "kind", "beautiful", "fun", "satisfied", "hopeful", "inspiring", "motivated",
+        "successful", "grateful", "brilliant", "smiling", "cozy", "safe", "calm", "harmonious",
+        "appreciated", "loved", "free", "strong", "brave", "energetic", "warm", "friendly",
+        "caring", "helpful", "creative", "smart", "meaningful", "uplifting", "relaxed",
+        "comfortable", "entertaining", "joy", "strength", "achievement", "laughter",
+        "pleasure", "bright", "welcoming", "festive", "honest", "loyal", "trustworthy",
+        "enthusiastic", "passionate", "love", "friendship", "community", "support",
+        "balance", "peace", "dreamy", "optimistic", "proud", "growing", "beautiful",
+        "clear", "radiant", "alive"
+    )
+
+    sad_words_EN = (
+    "sad", "angry", "disappointed", "lonely", "tired", "scared", "worried",
+    "stressed", "annoyed", "depressed", "confused", "empty", "hurt", "cold",
+    "miserable", "failed", "worthless", "hopeless", "bitter", "furious",
+    "jealous", "weak", "ashamed", "guilty", "broken", "sorrowful", "heavy",
+    "lost", "fear", "panic", "anxiety", "shaken", "crushed", "frozen",
+    "boring", "unhappy", "forgotten", "misunderstood", "sadness", "pressure",
+    "pain", "suffering", "concerned", "shame", "betrayal", "loss", "worry",
+    "doubt", "insecure", "fearful", "fragile", "tragedy", "death",
+    "desperate", "frustrated", "oppressed", "tormented", "rejected",
+    "isolated", "silent", "mourning", "diseased", "vulnerable",
+    "uncomfortable", "melancholic", "misery", "despair"
+    )
+
+    common_SE_words = ("och", "det", "att", "är", "som", "på", "inte", "för", "med")
+    common_EN_words = ("and", "the", "is", "to", "of", "in", "it", "for", "on")
+
+    #returns true if any of the common words exist in the word count dictionary
+    if any(word in word_count_dict for word in common_SE_words):
+        language = "SE"
+    elif any(word in word_count_dict for word in common_EN_words):
+        language = "EN"
+
+
+    if language == "SE":
+        for element in word_count_dict:
+            if element in happy_words_SE:
+                sentiment += word_count_dict[element]
+                
+            elif element in sad_words_SE:
+                sentiment -= word_count_dict[element]
+    elif language == "EN":
+        for element in word_count_dict:
+            if element in happy_words_EN:
+                sentiment += word_count_dict[element]
+                
+            elif element in sad_words_EN:
+                sentiment -= word_count_dict[element]
+
     return sentiment
 
 def calculate_sentiment_message(sentiment_score):
@@ -215,7 +262,10 @@ def find_number_words(line, word_count_dict, total_words, total_long_words, uniq
 
 
 def punctuation_remover(line):
-    for char in line: #checks each character in line
+    for char in line: #checks each character in lin
+        if char == "'": #checks if character is a '
+            line = line.replace(char, '')
+
         if char in '''~@#¤%^&*()_-+=<>?/,.;:!{}[]—|'"''': #checks if character is a special character
             line = line.replace(char, ' ') #replaces special characters with a space
     return line
